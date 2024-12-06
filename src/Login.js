@@ -1,59 +1,58 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Axios from "axios";
-import App from './App';
-import RegisterForm from "./RegisterForm";
-import {useNavigate, NavLink} from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
+Axios.defaults.withCredentials = true;
 
-function Login()
-{
+function Login() {
     const navigate = useNavigate();
-    const [usname , Setusname] = useState("");
-    const [passname , Setpassname] = useState("");
+    const [usname, setUsname] = useState("");
+    const [passname, setPassname] = useState("");
 
-    const [userList , setulist] = useState([]);
-
-    useEffect(() => {
-        Axios.get("Required API Link").then((res) => {
-            setulist(res.data);
-        });
-    } , []);
-
-    const putdata = () => {
-        let count=0;
-          for(let i=0;i<userList.length;i++) {
-            if(userList[i].username === usname)
-            {
-              if(userList[i].password === passname)
-              {
-                count=1;
-              }
+    const verify = async (e) => {
+        e.preventDefault();
+        try {
+            const responsee = await Axios.post("http://127.0.0.1:5000/api/login/", {
+                username: usname, 
+                password: passname 
+            });
+            console.log(responsee.data);
+            navigate("/");
+        } 
+        catch (error) {
+            if (error.response) {
+                console.log(error.response.data.message); 
+            } else {
+                console.log("An error occurred!");
             }
-            if(count===1){
-              navigate("/App",{state: usname});
-            }
-            else
-            {
-              navigate("/Login");
-            }
-          };
-      };
+        }
+    };
+    
 
-      <div className="outer">
-        <div className="inner">
-            <div className="upper">
-                <div className="up"> Pass-Man </div>
+    return (
+        <div className="outer">
+            <div className="inner">
+                <div className="nam">Login</div>
+                <div className="nam1">
+                    Don't have an account? <NavLink to="/RegisterForm">Click here</NavLink>
+                </div>
+                <input
+                    type="text"
+                    className="uname"
+                    placeholder="Enter Username"
+                    onChange={(event) => setUsname(event.target.value)}
+                />
+                <input
+                    type="password"
+                    className="pass"
+                    placeholder="Enter Password"
+                    onChange={(event) => setPassname(event.target.value)}
+                />
+                <button className="but" onClick={verify}>
+                    Login
+                </button>
             </div>
-            <div className="nam">Login</div>
-            <div className="nam1">Don't have an account? <NavLink to="/RegisterForm">Click here</NavLink></div>
-            <input type="text" className="uname" placeholder="Enter Username" onChange={(event) => {
-              Setusname(event.target.value);
-            }}/>
-            <input type="password" className="pass" placeholder="Enter Password" onChange={(event) => {
-              Setpassname(event.target.value);
-            }}/> 
-            <button className="but" onClick={putdata}>Login</button>
         </div>
-    </div>
-};
+    );
+}
 
 export default Login;
